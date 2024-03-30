@@ -22,3 +22,4 @@ end
 
 starting_pot = 1000
 game = Game.new(player_names, starting_pot)
+game.play

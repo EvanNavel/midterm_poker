@@ -1,12 +1,17 @@
 class Player
-  attr_accessor :hand, :pot, :folded
-  attr_reader :name, :folded
+  attr_accessor :hand, :pot
+  attr_reader :name
+  attr_writer :folded
 
   def initialize(name, starting_pot)
     @name = name
     @pot = starting_pot
-    @hand = Hand.new
+    @hand = Hand.new([])
     @folded = false
+  end
+
+  def folded?
+    @folded
   end
 
   def fold
@@ -41,5 +46,10 @@ class Player
 
   def toss_card(card)
     @hand.remove_card(card)
+  end
+
+  def prepare_for_new_round
+    @hand = Hand.new([])
+    @folded = false
   end
 end
