@@ -52,4 +52,9 @@ class Player
     @hand = Hand.new([])
     @folded = false
   end
+
+  def show_hand
+    card_descriptions = @hand.cards.map { |card| "#{card.rank} of #{card.suit}" }
+    puts "#{@name} has the following cards: #{card_descriptions.join(', ')}"
+  end
 end
