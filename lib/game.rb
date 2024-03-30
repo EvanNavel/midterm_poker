@@ -1,8 +1,14 @@
+require_relative 'deck'
+require_relative 'player'
+require_relative 'hand'
+require_relative 'card'
+
 class Game
   attr_reader :players, :deck, :current_bet, :pot
 
   def initialize(player_names, starting_pot)
-    @deck = Deck.new.shuffle
+    @deck = Deck.new
+    @deck.shuffle
     @players = player_names.map { |name| Player.new(name, starting_pot) }
     @current_bet = 0
     @pot = 0
@@ -10,12 +16,14 @@ class Game
   end
 
   def deal_cards
-    if @deck.is_a?(Deck) && @deck.cards.length >= 5
+    @deck.shuffle
+    if @deck.is_a?(Deck) && @deck.cards.length >= 5 * players.length
       players.each { |player| player.hand = Hand.new(@deck.deal(5)) }
     else
       puts "Not enough cards in the deck to deal."
     end
   end
+
 
   def take_bets
     players.each do |player|
@@ -48,6 +56,12 @@ class Game
     @pot = 0
   end
 
+  def round_of_play
+    reset_for_next_round
+    deal_cards
+    take_bets
+  end
+
   def play_round
     round_of_play
     winner = determine_winner
@@ -55,7 +69,9 @@ class Game
   end
 
   def reset_for_next_round
-    @deck = Deck.new.shuffle
+    puts "Resetting deck for next round.."
+    @deck = Deck.new
+    @deck.shuffle
     @current_bet = 0
     players.each(&:prepare_for_new_round)
   end
@@ -64,7 +80,6 @@ class Game
     while @round < 5
       play_round
       @round += 1
-      reset_for_next_round
     end
     puts "Thanks for playing Epic Poker!"
   end
