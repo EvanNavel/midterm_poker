@@ -15,7 +15,7 @@ class Deck
     @cards.shuffle!
   end
 
-  def deal_card
-    @cards.pop
+  def deal(number_of_cards)
+    @cards.pop(number_of_cards)
   end
 end

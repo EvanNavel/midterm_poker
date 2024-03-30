@@ -18,13 +18,17 @@ RSpec.describe Deck do
     end
   end
 
-  describe '#deal_card' do
-    it 'removes a card from the deck' do
-      expect { deck.deal_card }.to change(deck.cards, :count).by(-1)
+  describe '#deal' do
+    it 'deals a specified number of cards from the deck' do
+      expect { deck.deal(5) }.to change(deck.cards, :count).by(-5)
     end
 
-    it 'returns a random card' do
-      expect(deck.deal_card).to be_an_instance_of(Card)
+    it 'returns the number of cards' do
+      expect(deck.deal(5).count).to eq(5)
+    end
+
+    it 'returns an array of cards' do
+      expect(deck.deal(5)).to all(be_an_instance_of(Card))
     end
   end
 end
