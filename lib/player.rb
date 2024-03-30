@@ -54,7 +54,7 @@ class Player
   end
 
   def show_hand
-    card_descriptions = @hand.cards.map { |card| "#{card.rank} of #{card.suit}" }
-    puts "#{@name} has the following cards: #{card_descriptions.join(', ')}"
+    puts "#{name}, here are your cards:"
+    hand.cards.each { |card| puts "#{card.rank} of #{card.suit}" }
   end
 end

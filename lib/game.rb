@@ -15,12 +15,25 @@ class Game
     @round = 0
   end
 
+  def clear_screen
+    system("clear") || system("cls")
+  end
+
+  def show_hand(player)
+    clear_screen
+    puts "Player #{player.name}, press Enter when you are ready to see your hand."
+    gets
+    player.show_hand
+    puts "Press Enter when you are done looking at your hand and ready to bet or fold."
+    gets
+    clear_screen
+  end
+
   def deal_cards
     @deck.shuffle
     if @deck.is_a?(Deck) && @deck.cards.length >= 5 * players.length
       players.each do |player|
         player.hand = Hand.new(@deck.deal(5))
-        player.show_hand
       end
     else
       puts "Not enough cards in the deck to deal."
@@ -30,7 +43,7 @@ class Game
   def take_bets
     players.each do |player|
       next if player.folded?
-
+      show_hand(player)
       puts "#{player.name}, you have #{player.pot}. Press 'F' to fold or 'B' to bet:"
       action = gets.chomp.upcase
 
