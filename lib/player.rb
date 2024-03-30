@@ -1,5 +1,5 @@
 class Player
-  attr_accessor :hand, :pot
+  attr_accessor :hand, :pot, :folded
   attr_reader :name, :folded
 
   def initialize(name, starting_pot)

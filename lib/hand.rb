@@ -15,6 +15,14 @@ class Hand
     evaluate_hand.last
   end
 
+  def add_card(card)
+    @cards << card
+  end
+
+  def remove_card(card)
+    @cards.delete(card)
+  end
+
   def ranks
     @cards.map(&:rank)
   end
