@@ -20,16 +20,15 @@ class Game
 
   def take_bets
     players.each do |player|
-      next if player.folded
+      next if player.folded?
       puts "#{player.name}, you have #{player.pot}. How much do you want to bet?"
       bet_amount = gets.to_i
-
       if bet_amount >= @current_bet && bet_amount <= player.pot
         @pot += player.bet(bet_amount)
         @current_bet = bet_amount if bet_amount > @current_bet
       else
         puts "#{player.name} has folded." if bet_amount < @current_bet
-        puts "Bet amount is more than the pot." if bet_amount > player.pot
+        puts "Bet amount is more than available pot." if bet_amount > player.pot
         player.fold
       end
     end
@@ -41,11 +40,12 @@ class Game
   end
 
   def determine_winner
-    players.reject(&:folded).max_by { |player| player.hand.evaluate_hand.last }
+    players.reject(&:folded?).max_by { |player| player.hand.rank_value }
   end
 
   def distribute_winnings(winner)
-    winner.receive_winnings(@pot)
+    puts "#{winner.name} wins the pot of #{@pot}"
+    winner.add_to_pot(@pot)
     @pot = 0
   end
 
@@ -53,7 +53,6 @@ class Game
     round_of_play
     winner = determine_winner
     distribute_winnings(winner)
-    puts "#{winner.name} wins the round!"
   end
 
   def reset_for_next_round
@@ -63,8 +62,11 @@ class Game
   end
 
   def play
-    play_round
-    @round += 1
-    reset_for_next_round if @round < 5
+    while @round < 5
+      play_round
+      @round += 1
+      reset_for_next_round
+    end
+    puts "Thanks for playing Epic Poker!"
   end
 end
