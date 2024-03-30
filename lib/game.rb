@@ -7,7 +7,7 @@ class Game
   attr_reader :players, :deck, :current_bet, :pot
 
   def initialize(player_names, starting_pot)
-    @deck = Deck.new
+    @deck = Deck.new.shuffle
     @players = player_names.map { |name| Player.new(name, starting_pot) }
     @current_bet = 0
     @pot = 0
@@ -15,17 +15,21 @@ class Game
   end
 
   def deal_cards
-    players.each { |player| player.hand.cards = deck.deal(5) }
+    players.each { |player| player.hand = Hand.new(@deck.deal(5)) }
   end
 
   def take_bets
     players.each do |player|
-      bet_amount = player.decide_bet(current_bet)
-      if bet_amount >= current_bet
-        player.bet(bet_amount)
-        @pot += bet_amount
-        @current_bet = bet_amount if bet_amount > current_bet
+      next if player.folded
+      puts "#{player.name}, you have #{player.pot}. How much do you want to bet?"
+      bet_amount = gets.to_i
+
+      if bet_amount >= @current_bet && bet_amount <= player.pot
+        @pot += player.bet(bet_amount)
+        @current_bet = bet_amount if bet_amount > @current_bet
       else
+        puts "#{player.name} has folded." if bet_amount < @current_bet
+        puts "Bet amount is more than the pot." if bet_amount > player.pot
         player.fold
       end
     end
@@ -34,25 +38,33 @@ class Game
   def round_of_play
     deal_cards
     take_bets
-    # additional round logic
   end
 
   def determine_winner
-    players.reject(&:folded).max_by { |player| player.hand.rank_value }
+    players.reject(&:folded).max_by { |player| player.hand.evaluate_hand.last }
   end
 
-  def next_round
-    @deck = Deck.new
-    @current_bet = 0
+  def distribute_winnings(winner)
+    winner.receive_winnings(@pot)
     @pot = 0
-    players.each { |player| player.unfold; player.hand.cards.clear }
-    @round += 1
+  end
+
+  def play_round
+    round_of_play
+    winner = determine_winner
+    distribute_winnings(winner)
+    puts "#{winner.name} wins the round!"
+  end
+
+  def reset_for_next_round
+    @deck = Deck.new.shuffle
+    @current_bet = 0
+    players.each(&:prepare_for_new_round)
   end
 
   def play
-    round_of_play
-    winner = determine_winner
-    # end of round logic
-    next_round
+    play_round
+    @round += 1
+    reset_for_next_round if @round < 5
   end
 end

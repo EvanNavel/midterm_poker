@@ -73,7 +73,7 @@ RSpec.describe Player do
   end
 
   describe '#add_to_pot' do
-    it 'increases the pot by the specified amount' do
+    it 'increases the pot by the amount' do
       expect { player.add_to_pot(80) }.to change { player.pot }.by(80)
     end
   end

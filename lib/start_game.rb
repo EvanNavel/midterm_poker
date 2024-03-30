@@ -1,8 +1,8 @@
-require_relative 'lib/game'
-require_relative 'lib/player'
-require_relative 'lib/hand'
-require_relative 'lib/deck'
-require_relative 'lib/card'
+require_relative 'game'
+require_relative 'player'
+require_relative 'hand'
+require_relative 'deck'
+require_relative 'card'
 
 puts "Welcome to Epic Poker!"
 puts "How many players? (2-4):"
