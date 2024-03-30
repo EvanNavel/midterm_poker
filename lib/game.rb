@@ -1,8 +1,3 @@
-require_relative 'deck'
-require_relative 'player'
-require_relative 'hand'
-require_relative 'card'
-
 class Game
   attr_reader :players, :deck, :current_bet, :pot
 
@@ -15,7 +10,11 @@ class Game
   end
 
   def deal_cards
-    players.each { |player| player.hand = Hand.new(@deck.deal(5)) }
+    if @deck.is_a?(Deck) && @deck.cards.length >= 5
+      players.each { |player| player.hand = Hand.new(@deck.deal(5)) }
+    else
+      puts "Not enough cards in the deck to deal."
+    end
   end
 
   def take_bets

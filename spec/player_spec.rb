@@ -1,4 +1,4 @@
-# player_spec.rb
+
 require_relative '../lib/player'
 require_relative '../lib/hand'
 
