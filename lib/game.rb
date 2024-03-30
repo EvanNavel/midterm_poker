@@ -9,7 +9,7 @@ class Game
   def initialize(player_names, starting_pot)
     @deck = Deck.new
     @deck.shuffle
-    @players = player_names.map { |name| Player.new(name, starting_pot) }
+    @players = player_names.map { |name| Player.new(name, starting_pot) }.shuffle
     @current_bet = 0
     @pot = 0
     @round = 0
@@ -44,25 +44,33 @@ class Game
     players.each do |player|
       next if player.folded?
       show_hand(player)
-      puts "#{player.name}, you have #{player.pot}. Press 'F' to fold or 'B' to bet:"
+      puts "#{player.name}, the current bet to match is #{@current_bet}."
+      puts "You have #{player.pot}. Press 'F' to fold, 'C' to call, or 'R' to raise:"
       action = gets.chomp.upcase
 
-      if action == 'F'
+      case action
+      when 'F'
         player.fold
         puts "#{player.name} has folded."
-      elsif action == 'B'
-        puts "How much do you want to bet?"
-        bet_amount = gets.to_i
-        if bet_amount >= @current_bet && bet_amount <= player.pot
-          @pot += player.bet(bet_amount)
-          @current_bet = bet_amount if bet_amount > @current_bet
+      when 'C'
+        if player.pot >= @current_bet
+          @pot += player.bet(@current_bet)
         else
-          puts "Bet amount is more than available pot." if bet_amount > player.pot
+          puts "Insufficient funds to call. You must fold."
           player.fold
-          puts "#{player.name} has folded due to insufficient funds."
+        end
+      when 'R'
+        puts "How much do you want to raise by?"
+        raise_amount = gets.to_i
+        total_bet = @current_bet + raise_amount
+        if total_bet <= player.pot
+          @pot += player.bet(total_bet)
+          @current_bet = total_bet
+        else
+          puts "Insufficient funds to raise. You must fold or call."
         end
       else
-        puts "Invalid input. Please enter 'F' to fold or 'B' to bet."
+        puts "Invalid input. Please enter 'F' to fold, 'C' to call, or 'R' to raise."
         redo
       end
     end
@@ -82,16 +90,22 @@ class Game
     if winner
       puts "#{winner.name} wins the pot of #{@pot}"
       winner.add_to_pot(@pot)
+    else
+      puts "No winner this round."
     end
     @pot = 0
+    puts "Press Enter to continue to the next round."
+    gets
   end
 
   def reset_for_next_round
     puts "Resetting deck for the next round..."
     @deck = Deck.new
     @deck.shuffle
+    @players.shuffle!
     @current_bet = 0
     players.each(&:prepare_for_new_round)
+    clear_screen
   end
 
   def play_round
