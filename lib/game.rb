@@ -50,7 +50,6 @@ class Game
       if action == 'F'
         player.fold
         puts "#{player.name} has folded."
-        next
       elsif action == 'B'
         puts "How much do you want to bet?"
         bet_amount = gets.to_i
@@ -60,6 +59,7 @@ class Game
         else
           puts "Bet amount is more than available pot." if bet_amount > player.pot
           player.fold
+          puts "#{player.name} has folded due to insufficient funds."
         end
       else
         puts "Invalid input. Please enter 'F' to fold or 'B' to bet."
@@ -69,12 +69,20 @@ class Game
   end
 
   def determine_winner
-    players.reject(&:folded?).max_by { |player| player.hand.rank_value }
+    winning_player = players.reject(&:folded?).max_by { |player| player.hand.rank_value }
+    if winning_player
+      puts "#{winning_player.name} has the winning hand."
+    else
+      puts "No winner this round as all players have folded."
+    end
+    winning_player
   end
 
   def distribute_winnings(winner)
-    puts "#{winner.name} wins the pot of #{@pot}"
-    winner.add_to_pot(@pot)
+    if winner
+      puts "#{winner.name} wins the pot of #{@pot}"
+      winner.add_to_pot(@pot)
+    end
     @pot = 0
   end
 
@@ -83,7 +91,6 @@ class Game
     @deck = Deck.new
     @deck.shuffle
     @current_bet = 0
-    @pot = 0
     players.each(&:prepare_for_new_round)
   end
 
@@ -92,7 +99,9 @@ class Game
     deal_cards
     take_bets
     winner = determine_winner
-    distribute_winnings(winner)
+    distribute_winnings(winner) if winner
+    puts "Press Enter to continue to the next round."
+    gets
   end
 
   def play
